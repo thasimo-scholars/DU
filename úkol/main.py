@@ -12,6 +12,8 @@ save = 0
 i = 0
 g = 1
 dic = 0
+file_path1 = "DU/úkol/budget.csv"
+
 #proměné grafu %
 es1 = 0
 es2 = 0
@@ -37,13 +39,15 @@ sumy=[]
 #dictionaries
 dictionary_event = {}
 
-
-f = open("budget.csv", "r")
+#otevřít soubor, smazat první řádek a seřadit
+f = open(file_path1, "r")
 rozdeleni_na_radky = f.read().splitlines()
 
 rozdeleni_na_radky.pop(0)
 rozdeleni_na_radky.sort()
 
+
+#rozdělení řádků do listů (cat-categorie, am-amount, sp-spent, st-status)
 for radek in rozdeleni_na_radky:
     r = radek.split(";")
     cat.append(r[0])
@@ -54,12 +58,12 @@ for radek in rozdeleni_na_radky:
     sp[i] = float(sp[i])
     i += 1
 
-
+#amount a spent do slovníků
 amount_dict = {category: [] for category in set(cat)}
 spent_dict = {category: [] for category in set(cat)}
 
-cat = list(set(cat))
-
+cat = list(set(cat)) #odstranění duplicit
+#přidání hodnot do slovníků, ke každé kategorii přidá hodnoty
 for category in cat:
     for radek in rozdeleni_na_radky:
         r = radek.split(";")
@@ -74,9 +78,9 @@ for category in cat:
                 
                 
 
-st = list(set(st))
+st = list(set(st)) #odstranění duplicit
 
-
+#spočítání, kolik je dohromady closed, planing, open a pokud existuje, tak i ostatní
 for radek in rozdeleni_na_radky:
     r = radek.split(";")
     if k+1 < len(st):
@@ -104,7 +108,7 @@ for radek in rozdeleni_na_radky:
     else:
         k = 0    
         
-
+#výpočet procent
 procentaprvni = es1/dohromadyvsech*100
 procentadruhy = es2/dohromadyvsech*100 
 procentatreti = es3/dohromadyvsech*100
@@ -112,7 +116,7 @@ procenataostatni = esostatni/dohromadyvsech*100
 
 
  
-
+#ke kategorii přidat procenta
 while dic < len(cat):
     while dic == 0:
         dictionary_event[st[dic]] = float(procentaprvni)
@@ -133,7 +137,7 @@ while dic < len(cat):
     break
 
 
-
+#graf v matlibu
 def sloupecgraf():
     global save
     catnnum = {key: (sum(amount_dict[key]), sum(spent_dict[key])) for key in amount_dict}
@@ -142,9 +146,9 @@ def sloupecgraf():
     values2 = [value[1] for value in catnnum.values()]
 
 
-
+    #filter out empty values 
     keys, values1, values2 = zip(*[(k, v1, v2) for k, v1, v2 in zip(keys, values1, values2) if v1 and v2])
-
+    #zda je float a int. 
     if all(isinstance(val, (int, float)) for val in values1) and all(isinstance(val, (int, float)) for val in values2):
         bar_width = 0.35
         index = np.arange(len(keys))
@@ -179,7 +183,7 @@ def sloupecgraf():
     else:
         print("Error: values1 and values2 should contain only numbers.")
 
-        
+#už mě to nebaví popisovat. Kdyby něco nebylo jasné, tak se @me   
 
 
 def kolackobedu():
@@ -230,7 +234,7 @@ def bud(textbox):
     textbox.configure(state='normal')
     textbox.delete("1.0", "end")
     textbox.configure(state='disabled')
-    sber = seber_lines('budget.csv')
+    sber = seber_lines(file_path1)
 
     next(sber)
     for radek in rozdeleni_na_radky:
@@ -322,7 +326,7 @@ def save_info(textbox, amount_dict, spent_dict):
     průměr(textbox, amount_dict, spent_dict)
     #ne nedám ti to do .csv. jsem rád, že se mi povedlo vůbec to .txt :D
     
-    folder_path = 'úkol/' # replace with the actual folder path
+    folder_path = 'DU/úkol' # replace with the actual folder path
     file_path = os.path.join(folder_path, 'results.txt')
 
     if os.path.exists(file_path):
@@ -368,7 +372,7 @@ class App(tk.Tk):
 
  
         self.title("Úkolíček")
-        self.geometry("1000x750+100+100")
+        self.geometry("1100x850+100+100")
         self.configure(bg="#255957")
         
         label_frame = tk.Frame(self, bg="#255957")
@@ -460,7 +464,7 @@ class Window1(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
 
-        self.video_source = "úkol\easteregg.mp4"
+        self.video_source = "DU/úkol/easteregg.mp4"
         self.cap = cv2.VideoCapture(self.video_source)
         self.width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
         self.height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -514,7 +518,7 @@ class Window4(tk.Toplevel):
         self.title('Toplevel Window')
 
         
-        image = Image.open('úkol\ha.jpg')
+        image = Image.open('DU/úkol/ha.jpg')
         image = image.resize((1920, 1080), Image.ANTIALIAS)
         
         self.photo = ImageTk.PhotoImage(image)
