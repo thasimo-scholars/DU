@@ -487,7 +487,6 @@ class Window1(tk.Toplevel):
         else:
             self.cap.release()
 
-
 class Window2(tk.Toplevel):
     def __init__(self, parent):
         super().__init__(parent)
